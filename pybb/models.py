@@ -3,7 +3,7 @@
 import os.path
 import uuid
 
-from django.db import models
+from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
@@ -158,6 +158,7 @@ class Topic(models.Model):
 
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
     name = models.CharField(_('Subject'), max_length=255)
+    place = models.GeometryField(_('Place'))
     created = models.DateTimeField(_('Created'), null=True)
     updated = models.DateTimeField(_('Updated'), null=True)
     user = models.ForeignKey(User, verbose_name=_('User'))
@@ -171,6 +172,7 @@ class Topic(models.Model):
     on_moderation = models.BooleanField(_('On moderation'), default=False)
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
     poll_question = models.TextField(_('Poll question'), blank=True, null=True)
+    objects = models.GeoManager()
 
     class Meta(object):
         ordering = ['-created']

@@ -64,6 +64,11 @@ class PostForm(forms.ModelForm):
         label=_('Poll question'),
         required=False,
         widget=forms.Textarea(attrs={'class': 'no-markitup'}))
+    # Place hidden input element as WKT
+    place = forms.CharField(
+        label=_('Place'),
+        required=False,
+        widget=forms.HiddenInput())
 
     class Meta(object):
         model = Post
@@ -92,6 +97,7 @@ class PostForm(forms.ModelForm):
             del self.fields['name']
             del self.fields['poll_type']
             del self.fields['poll_question']
+            del self.fields['place']
 
         self.available_smiles = defaults.PYBB_SMILES
         self.smiles_prefix = defaults.PYBB_SMILES_PREFIX
@@ -121,6 +127,7 @@ class PostForm(forms.ModelForm):
                 post.user = self.user
             if post.topic.head == post:
                 post.topic.name = self.cleaned_data['name']
+                post.topic.place = self.cleaned_data['place']
                 post.topic.poll_type = self.cleaned_data['poll_type']
                 post.topic.poll_question = self.cleaned_data['poll_question']
                 post.topic.updated = tznow()
@@ -136,6 +143,7 @@ class PostForm(forms.ModelForm):
                 forum=self.forum,
                 user=self.user,
                 name=self.cleaned_data['name'],
+                place=self.cleaned_data['place'],
                 poll_type=self.cleaned_data['poll_type'],
                 poll_question=self.cleaned_data['poll_question'],
             )
