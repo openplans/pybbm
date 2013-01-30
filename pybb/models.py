@@ -145,6 +145,31 @@ class Forum(models.Model):
         return self.category,
 
 
+class WatchArea(models.Model):
+    name = models.CharField(_('Name'), max_length=80)
+    fence = models.GeometryField(_('Area'))
+    created = models.DateTimeField(_('Created'), null=True)
+    updated = models.DateTimeField(_('Updated'), null=True)
+    user = models.ForeignKey(User, verbose_name=_('User'))
+    sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
+    watchers = models.ManyToManyField(User, related_name='areas', 
+        verbose_name=_('Watchers'), blank=False)
+    public = models.BooleanField(_('Public'), default=False)
+
+    class Meta(object):
+        ordering = ['-created']
+        verbose_name = _('Watch Area')
+        verbose_name_plural = _('Watch Areas')
+
+    def __unicode__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            self.created = tznow()
+        super(WatchArea, self).save(*args, **kwargs)
+
+
 class Topic(models.Model):
     POLL_TYPE_NONE = 0
     POLL_TYPE_SINGLE = 1
