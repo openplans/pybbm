@@ -89,6 +89,7 @@ class PostForm(forms.ModelForm):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
             kwargs.setdefault('initial', {})['poll_type'] = kwargs['instance'].topic.poll_type
             kwargs.setdefault('initial', {})['poll_question'] = kwargs['instance'].topic.poll_question
+            kwargs.setdefault('initial', {})['place'] = kwargs['instance'].topic.place
 
         super(PostForm, self).__init__(**kwargs)
 
