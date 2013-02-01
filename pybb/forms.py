@@ -129,13 +129,12 @@ class PostForm(forms.ModelForm):
             body = cleaner(user, body)
         return body
 
-    def clean(self):
+    def clean_poll_question(self):
         poll_type = self.cleaned_data.get('poll_type', None)
         poll_question = self.cleaned_data.get('poll_question', None)
         if poll_type is not None and poll_type != Topic.POLL_TYPE_NONE and not poll_question:
-            raise forms.ValidationError(_('Poll''s question is required when adding a poll'))
-
-        return self.cleaned_data
+            raise forms.ValidationError(_('Poll question is required.'))
+        return poll_question
 
     def save(self, commit=True):
         if self.instance.pk:
