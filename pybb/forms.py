@@ -58,9 +58,13 @@ PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=de
 
 
 class WatchAreaForm(forms.ModelForm):
+    fence = forms.CharField(
+        label=_('Area'),
+        widget=forms.HiddenInput())
+
     class Meta(object):
         model = WatchArea
-        fields = ('name', 'fence')
+        fields = ('name', )
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
