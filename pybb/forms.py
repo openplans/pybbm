@@ -17,7 +17,7 @@ except ImportError:
 
     tznow = datetime.datetime.now
 
-from pybb.models import Topic, Post, Profile, Attachment, PollAnswer
+from pybb.models import Topic, Post, Profile, Attachment, PollAnswer, WatchArea
 from pybb import defaults
 
 
@@ -57,6 +57,23 @@ PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=de
     form=PollAnswerForm, formset=BasePollAnswerFormset)
 
 
+class WatchAreaForm(forms.ModelForm):
+    class Meta(object):
+        model = WatchArea
+        fields = ('name', 'fence')
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(WatchAreaForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super(WatchAreaForm, self).save(commit=False)
+        if self.user:
+            instance.user = self.user
+
+        instance.save()
+
+
 class PostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
     poll_type = forms.TypedChoiceField(label=_('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
@@ -89,7 +106,6 @@ class PostForm(forms.ModelForm):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
             kwargs.setdefault('initial', {})['poll_type'] = kwargs['instance'].topic.poll_type
             kwargs.setdefault('initial', {})['poll_question'] = kwargs['instance'].topic.poll_question
-            kwargs.setdefault('initial', {})['place'] = kwargs['instance'].topic.place
 
         super(PostForm, self).__init__(**kwargs)
 

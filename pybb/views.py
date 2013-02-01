@@ -26,8 +26,10 @@ except ImportError:
 
 from pure_pagination import Paginator
 
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, \
+    ForumReadTracker, PollAnswerUser, WatchArea
+from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, \
+    AttachmentFormSet, PollAnswerFormSet, PollForm, WatchAreaForm
 from pybb.templatetags.pybb_tags import pybb_editable_by, pybb_topic_poll_not_voted
 from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 from pybb import defaults
@@ -254,6 +256,22 @@ class PostEditMixin(object):
         else:
             self.object.delete()
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+
+
+class AddWatchAreaView(generic.CreateView):
+
+    template_name = 'pybb/add_watch_area.html'
+    model = WatchArea
+    form_class = WatchAreaForm
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AddWatchAreaView, self).dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super(AddWatchAreaView, self).get_form_kwargs()
+        form_kwargs.update({'user': self.request.user})
+        return form_kwargs
 
 
 class AddPostView(PostEditMixin, generic.CreateView):

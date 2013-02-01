@@ -153,7 +153,7 @@ class WatchArea(models.Model):
     user = models.ForeignKey(User, verbose_name=_('User'))
     sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
     watchers = models.ManyToManyField(User, related_name='areas', 
-        verbose_name=_('Watchers'), blank=False)
+        verbose_name=_('Watchers'), blank=True)
     public = models.BooleanField(_('Public'), default=False)
 
     class Meta(object):
