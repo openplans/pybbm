@@ -64,7 +64,7 @@ class WatchAreaForm(forms.ModelForm):
 
     class Meta(object):
         model = WatchArea
-        fields = ('name', )
+        fields = ('name', 'fence')
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
