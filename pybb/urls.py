@@ -7,7 +7,7 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView, \
-    AddWatchAreaView
+    AddWatchAreaView, EditWatchAreaView
 
 
 urlpatterns = patterns('',
@@ -50,6 +50,7 @@ urlpatterns += patterns('pybb.views',
 
                         # Watch areas
                         url('^watch_area/add/$', AddWatchAreaView.as_view(), name='add_watch_area'),
+                        url('^watch_area/(?P<pk>\d+)/edit/$', EditWatchAreaView.as_view(), name='edit_watch_area'),
                         # url('^watch_area/(?P<pk>\d+)/$', WatchAreaView.as_view(), name='watch_area'),
 
                         # Attachment

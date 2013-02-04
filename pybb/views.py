@@ -69,7 +69,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return filter_hidden(self.request, Category)
 
-    
+
 class CategoryView(generic.DetailView):
 
     template_name = 'pybb/index.html'
@@ -108,7 +108,7 @@ class ForumView(generic.ListView):
             else:
                 qs = qs.filter(on_moderation=False)
         return qs
-    
+
 
 class LatestTopicsView(generic.ListView):
 
@@ -195,7 +195,7 @@ class TopicView(generic.ListView):
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
+            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) |
                                                                 Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
             unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
             if not unread.exists():
@@ -270,6 +270,22 @@ class AddWatchAreaView(generic.CreateView):
 
     def get_form_kwargs(self):
         form_kwargs = super(AddWatchAreaView, self).get_form_kwargs()
+        form_kwargs.update({'user': self.request.user})
+        return form_kwargs
+
+
+class EditWatchAreaView(generic.UpdateView):
+
+    template_name = 'pybb/add_watch_area.html'
+    model = WatchArea
+    form_class = WatchAreaForm
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(EditWatchAreaView, self).dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super(EditWatchAreaView, self).get_form_kwargs()
         form_kwargs.update({'user': self.request.user})
         return form_kwargs
 
@@ -367,7 +383,7 @@ class UserView(generic.DetailView):
         ctx = super(UserView, self).get_context_data(**kwargs)
         ctx['topic_count'] = Topic.objects.filter(user=ctx['target_user']).count()
         return ctx
-        
+
 
 class PostView(generic.RedirectView):
     def get_redirect_url(self, **kwargs):
