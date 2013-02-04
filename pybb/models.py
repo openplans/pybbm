@@ -150,9 +150,9 @@ class WatchArea(models.Model):
     fence = models.GeometryField(_('Area'))
     created = models.DateTimeField(_('Created'), null=True)
     updated = models.DateTimeField(_('Updated'), null=True)
-    user = models.ForeignKey(User, verbose_name=_('User'))
+    user = models.ForeignKey(User, verbose_name=_('User'), related_name='watch_areas')
     sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
-    watchers = models.ManyToManyField(User, related_name='areas', 
+    watchers = models.ManyToManyField(User, related_name='areas',
         verbose_name=_('Watchers'), blank=True)
     public = models.BooleanField(_('Public'), default=False)
 
@@ -163,6 +163,9 @@ class WatchArea(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('pybb:watch_area_topics', kwargs={'pk': self.id})
 
     def save(self, *args, **kwargs):
         if self.id is None:

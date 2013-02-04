@@ -76,6 +76,7 @@ class WatchAreaForm(forms.ModelForm):
             instance.user = self.user
 
         instance.save()
+        return instance
 
 
 class PostForm(forms.ModelForm):

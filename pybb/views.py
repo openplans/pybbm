@@ -130,6 +130,22 @@ class LatestTopicsView(generic.ListView):
         return qs.order_by('-updated')
 
 
+class WatchAreaTopicsView(LatestTopicsView):
+
+    template_name = 'pybb/watch_area_topics.html'
+
+    def get_queryset(self):
+        qs = super(WatchAreaTopicsView, self).get_queryset()
+        self.watch_area = get_object_or_404(WatchArea, pk=self.kwargs['pk'])
+        qs = qs.filter(place__within=self.watch_area.fence)  # Should we use within or intersects?
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super(WatchAreaTopicsView, self).get_context_data(**kwargs)
+        ctx['watch_area'] = self.watch_area
+        return ctx
+
+
 class TopicView(generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
     template_object_name = 'post_list'
@@ -286,6 +302,25 @@ class EditWatchAreaView(generic.UpdateView):
 
     def get_form_kwargs(self):
         form_kwargs = super(EditWatchAreaView, self).get_form_kwargs()
+        form_kwargs.update({'user': self.request.user})
+        return form_kwargs
+
+
+class DeleteWatchAreaView(generic.DeleteView):
+
+    model = WatchArea
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        user = self.request.user
+        return self.model.objects.filter(user=user).filter(pk=pk)
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DeleteWatchAreaView, self).dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super(DeleteWatchAreaView, self).get_form_kwargs()
         form_kwargs.update({'user': self.request.user})
         return form_kwargs
 
