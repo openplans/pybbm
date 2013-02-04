@@ -1,11 +1,11 @@
 # -*- coding: utf-8
 
 from django.utils.translation import ugettext_lazy as _
-from django.contrib import admin
+from django.contrib.gis import admin
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer, WatchArea
 
 
 class ForumInlineAdmin(admin.TabularInline):
@@ -21,6 +21,10 @@ class CategoryAdmin(admin.ModelAdmin):
     list_editable = ['position']
 
     inlines = [ForumInlineAdmin]
+
+
+class WatchAreaAdmin(admin.OSMGeoAdmin):
+    pass
 
 
 class ForumAdmin(admin.ModelAdmin):
@@ -138,6 +142,7 @@ admin.site.register(Forum, ForumAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
+admin.site.register(WatchArea, WatchAreaAdmin)
 
 if settings.AUTH_PROFILE_MODULE == 'pybb.Profile':
     admin.site.register(Profile, ProfileAdmin)
