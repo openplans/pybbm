@@ -308,6 +308,7 @@ class EditWatchAreaView(generic.UpdateView):
 
 class DeleteWatchAreaView(generic.DeleteView):
 
+    template_name = 'pybb/watch_area_confirm_delete.html'
     model = WatchArea
 
     def get_queryset(self):
@@ -323,6 +324,20 @@ class DeleteWatchAreaView(generic.DeleteView):
         form_kwargs = super(DeleteWatchAreaView, self).get_form_kwargs()
         form_kwargs.update({'user': self.request.user})
         return form_kwargs
+
+    def get_context_data(self, **kwargs):
+        prev_url = self.request.GET.get('prev')
+        next_url = self.request.GET.get('next')
+        return super(DeleteWatchAreaView, self).get_context_data(
+            prev_url=prev_url,
+            next_url=next_url,
+            **kwargs
+        )
+
+    def get_success_url(self):
+        if 'next' in self.request.GET:
+            return self.request.GET['next']
+        return reverse('pybb:edit_profile')
 
 
 class AddPostView(PostEditMixin, generic.CreateView):
