@@ -156,6 +156,8 @@ class WatchArea(models.Model):
         verbose_name=_('Watchers'), blank=True)
     public = models.BooleanField(_('Public'), default=False)
 
+    objects = models.GeoManager()
+
     class Meta(object):
         ordering = ['-created']
         verbose_name = _('Watch Area')

@@ -48,3 +48,49 @@ def notify_topic_subscribers(post):
                                              })
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=True)
                 translation.activate(old_lang)
+
+
+def notify_area_watchers(topic):
+    from pybb.models import WatchArea
+
+    place = topic.place
+    watch_areas = WatchArea.objects.filter(fence__intersects=place).prefetch_related('watchers')
+    watchers = {}
+
+    # Construct a mapping from user primary key to a tuple of
+    # (user, [watch areas that contain this topic]).
+    for watch_area in watch_areas:
+        users = watch_area.watchers.all()
+        for user in users:
+            if user.pk in watchers:
+                watchers[user.pk][1].append(watch_area)
+            else:
+                watchers[user.pk] = (user, [watch_area])
+
+    for user, watch_areas in watchers.itervalues():
+        if user != topic.user:
+            try:
+                email_validator.clean(user.email)
+            except:
+                #invalid email
+                continue
+            old_lang = translation.get_language()
+            lang = user.get_profile().language or settings.LANGUAGE_CODE
+            translation.activate(lang)
+            manage_url = reverse('pybb:edit_profile', args=[])
+            current_site = Site.objects.get_current()
+            subject = render_to_string('pybb/mail_templates/watch_area_subscription_email_subject.html',
+                                       { 'site': current_site,
+                                         'watch_areas': watch_areas,
+                                         'topic': topic
+                                       })
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            message = render_to_string('pybb/mail_templates/watch_area_subscription_email_body.html',
+                                       { 'site': current_site,
+                                         'topic': topic,
+                                         'watch_areas': watch_areas,
+                                         'manage_url': manage_url,
+                                         })
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=True)
+            translation.activate(old_lang)

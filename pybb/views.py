@@ -605,6 +605,28 @@ def add_subscription(request, topic_id):
         return HttpResponseRedirect(topic.get_absolute_url())
 
 
+@csrf_exempt
+@login_required
+def delete_watch_area_subscription(request, watch_area_id):
+    watch_area = get_object_or_404(WatchArea, pk=watch_area_id)
+    watch_area.watchers.remove(request.user)
+    if (request.is_ajax()):
+        return HttpResponse(status=204)
+    else:
+        return HttpResponseRedirect(watch_area.get_absolute_url())
+
+
+@csrf_exempt
+@login_required
+def add_watch_area_subscription(request, watch_area_id):
+    watch_area = get_object_or_404(WatchArea, pk=watch_area_id)
+    watch_area.watchers.add(request.user)
+    if (request.is_ajax()):
+        return HttpResponse(status=204)
+    else:
+        return HttpResponseRedirect(watch_area.get_absolute_url())
+
+
 @login_required
 def post_ajax_preview(request):
     content = request.POST.get('data')

@@ -63,6 +63,10 @@ urlpatterns += patterns('pybb.views',
                             'delete_subscription', name='delete_subscription'),
                         url('^subscription/topic/(\d+)/add/$',
                             'add_subscription', name='add_subscription'),
+                        url('^subscription/watch_area/(\d+)/delete/$',
+                            'delete_watch_area_subscription', name='delete_watch_area_subscription'),
+                        url('^subscription/watch_area/(\d+)/add/$',
+                            'add_watch_area_subscription', name='add_watch_area_subscription'),
 
                         # API
                         url('^api/post_ajax_preview/$', 'post_ajax_preview', name='post_ajax_preview'),

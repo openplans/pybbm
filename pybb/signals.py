@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save, post_delete
 
-from pybb.subscription import notify_topic_subscribers
+from pybb.subscription import notify_topic_subscribers, notify_area_watchers
 from pybb import defaults
 
 
@@ -25,6 +25,18 @@ def post_deleted(instance, **kwargs):
     profile.post_count = instance.user.posts.count()
     profile.save()
 
+def topic_saved(instance, **kwargs):
+    # We're only concerned with when a topic is created.
+    if not kwargs['created']:
+        return
+
+    notify_area_watchers(instance)
+
+def watch_area_saved(instance, **kwargs):
+    if kwargs['created']:
+        if instance.user.get_profile().autosubscribe:
+            instance.watchers.add(instance.user)
+
 def user_saved(instance, created, **kwargs):
     if not created:
         return
@@ -40,8 +52,11 @@ def user_saved(instance, created, **kwargs):
         Profile(user=instance).save()
 
 def setup_signals():
-    from models import Post
+    from models import Post, Topic, WatchArea
     post_save.connect(post_saved, sender=Post)
     post_delete.connect(post_deleted, sender=Post)
+    post_save.connect(topic_saved, sender=Topic)
+    post_save.connect(watch_area_saved, sender=WatchArea)
+
     if defaults.PYBB_AUTO_USER_PERMISSIONS:
         post_save.connect(user_saved, sender=User)

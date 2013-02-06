@@ -1,0 +1,14 @@
+{% load i18n %}
+
+{% trans "User" %} {{ topic.user.username }} {% trans "posted a new topic in one of your watch areas." %}
+
+{{ topic.name }}
+{% trans "Link to topic:" %} http://{{site}}{{ topic.get_absolute_url }}
+
+{% trans "In these watch areas:" %}{% for watch_area in watch_areas %}
+- {{ watch_area.name }}
+  Link to watch area: http://{{site}}{{ watch_area.get_absolute_url }}
+
+{% endfor %}
+-----
+{% trans "If you don't want to receive notifications for new topics, manage your watch areas at:" %} http://{{site}}{{ manage_url }}
