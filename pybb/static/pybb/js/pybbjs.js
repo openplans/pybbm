@@ -17,6 +17,8 @@ function pybb_delete_post(url, post_id, confirm_text){
 
 $(function() {
     // This is logic for handling subscription requests asynchonously
+    // TODO: this only works for the topic list. Update to work on the topic
+    // page and the watch area subscriptions.
     $('.topic-subscribe a').click(function(evt) {
         evt.preventDefault();
         var $link = $(this),
