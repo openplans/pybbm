@@ -5,7 +5,7 @@ Project tree contains two example projects in `test/example_bootstrap` and `test
 it is fully deployed and ready to use forum applications. Only one distinction between this projects:
 example_bootstrap includes Twitter bootstrap's less files while example_thirdparty leave this to thirdparty apps -
 pinax-theme-bootstrap, django-forms-bootstrap and pinax-theme-bootstrap-account. We recommend to use thirdparty apps to start with.
-If you starting from scratch it's probaly the best way to begin.
+If you starting from scratch it's probably the best way to begin.
 
 Running example project
 -----------------------
