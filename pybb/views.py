@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
 try:
     from django.views import generic
@@ -583,18 +583,26 @@ class TopicPollVoteView(generic.UpdateView):
         return self.object.get_absolute_url()
 
 
+@csrf_exempt
 @login_required
 def delete_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.remove(request.user)
-    return HttpResponseRedirect(topic.get_absolute_url())
+    if (request.is_ajax()):
+        return HttpResponse(status=204)
+    else:
+        return HttpResponseRedirect(topic.get_absolute_url())
 
 
+@csrf_exempt
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
-    return HttpResponseRedirect(topic.get_absolute_url())
+    if (request.is_ajax()):
+        return HttpResponse(status=204)
+    else:
+        return HttpResponseRedirect(topic.get_absolute_url())
 
 
 @login_required

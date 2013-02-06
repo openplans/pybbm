@@ -15,6 +15,9 @@
             <th class="topic-last-post">
                 {% trans "Last post" %}
             </th>
+            <th class="topic-subscribe">
+                {% trans "Subscribe to Updates" %}
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -50,6 +53,20 @@
             </td>
             <td class="topic-last-post">
                 {% include "pybb/topic_last_message_info.html" %}
+            </td>
+            <td class="topic-subscribe">
+                <a data-add-subscription-href="{% url pybb:add_subscription topic.id %}"
+                    data-delete-subscription-href="{% url pybb:delete_subscription topic.id %}"
+                    data-add-subscription-label="{% trans "Subscribe" %}"
+                    data-delete-subscription-label="{% trans "Unsubscribe" %}"
+                {% if user in topic.subscribers.all %}
+                    class="topic-delete-subscription" href="{% url pybb:delete_subscription topic.id %}">
+                    {% trans "Unsubscribe" %}
+                {% else %}
+                    class="topic-add-subscription" href="{% url pybb:add_subscription topic.id %}">
+                    {% trans "Subscribe" %}
+                {% endif %}
+                </a>
             </td>
         </tr>
     {% endfor %}
