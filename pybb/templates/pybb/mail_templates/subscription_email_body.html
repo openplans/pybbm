@@ -1,11 +1,11 @@
 {% load i18n %}
 
-{% trans "Check it out!" %} {{ post.user.username }} {% trans "commented on the discussion%} "{{ post.topic.name }}".
+{% trans "Check it out!" %} {{ post.user.username }} {% trans "commented on the discussion" %} "{{ post.topic.name }}".
 
 {% trans "You can see the comment here" %}: http://{{site}}{{ post.get_absolute_url }}
 
 {% trans "Keep up the good work!" %}
-- {% trans "the" %} {{site.name}} {% trans "team" %}
+- {% blocktrans %}The {{site.name}} team{% endblocktrans %}
 
 
 -----
