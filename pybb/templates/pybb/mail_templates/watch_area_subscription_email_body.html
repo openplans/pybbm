@@ -1,14 +1,12 @@
 {% load i18n %}
 
-{% trans "User" %} {{ topic.user.username }} {% trans "posted a new topic in one of your watch areas." %}
+{% trans "Check it out!" %} {{ topic.user.username }} {% trans "started a discussion in your watch area%} "{{ topic.name }}".
 
-{{ topic.name }}
-{% trans "Link to topic:" %} http://{{site}}{{ topic.get_absolute_url }}
+{% trans "You can join the discussion here" %}: http://{{site}}{{ topic.get_absolute_url }}
 
-{% trans "In these watch areas:" %}{% for watch_area in watch_areas %}
-- {{ watch_area.name }}
-  Link to watch area: http://{{site}}{{ watch_area.get_absolute_url }}
+{% trans "Keep up the good work!" %}
+- {% trans "the" %} {{site.name}} {% trans "team" %}
 
-{% endfor %}
+
 -----
 {% trans "If you don't want to receive notifications for new topics, manage your watch areas at:" %} http://{{site}}{{ manage_url }}
