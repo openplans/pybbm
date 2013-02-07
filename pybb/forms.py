@@ -109,6 +109,7 @@ class PostForm(forms.ModelForm):
             #Handle topic subject, poll type and question if editing topic head
         if ('instance' in kwargs) and kwargs['instance'] and (kwargs['instance'].topic.head == kwargs['instance']):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
+            kwargs.setdefault('initial', {})['place'] = kwargs['instance'].topic.place
             kwargs.setdefault('initial', {})['poll_type'] = kwargs['instance'].topic.poll_type
             kwargs.setdefault('initial', {})['poll_question'] = kwargs['instance'].topic.poll_question
 
