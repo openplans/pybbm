@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% trans "Check it out!" %} {{ topic.user.username }} {% trans "started a discussion in your watch area%} "{{ topic.name }}".
+{% trans "Check it out!" %} {{ topic.user.username }} {% trans "started a discussion called" %} "{{ topic.name }}" {% trans "in your watch area." %}.
 
 {% trans "You can join the discussion here" %}: http://{{site}}{{ topic.get_absolute_url }}
 
