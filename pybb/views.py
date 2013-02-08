@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
@@ -53,6 +54,7 @@ def filter_hidden_topics(request, queryset_or_model):
         return queryset
     return queryset.filter(forum__hidden=False, forum__category__hidden=False)
 
+
 class IndexView(generic.ListView):
 
     template_name = 'pybb/index.html'
@@ -64,6 +66,8 @@ class IndexView(generic.ListView):
         for category in categories:
             category.forums_accessed = filter_hidden(self.request, category.forums.all())
         ctx['categories'] = categories
+        ctx['site'] = Site.objects.get_current()
+        ctx['absolute_static'] = self.request.build_absolute_uri(staticfiles_storage.base_url)
         return ctx
 
     def get_queryset(self):
