@@ -4,10 +4,10 @@ import math
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.db import transaction
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
@@ -172,6 +172,9 @@ class TopicView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
+
+        ctx['site'] = Site.objects.get_current()
+
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = self.request.user.is_superuser or (self.request.user in self.topic.forum.moderators.all())
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
