@@ -178,6 +178,7 @@ class TopicView(generic.ListView):
         ctx = super(TopicView, self).get_context_data(**kwargs)
 
         ctx['site'] = Site.objects.get_current()
+        ctx['absolute_static'] = self.request.build_absolute_uri(staticfiles_storage.base_url)
 
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = self.request.user.is_superuser or (self.request.user in self.topic.forum.moderators.all())
