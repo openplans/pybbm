@@ -58,6 +58,9 @@ def get_file_path(instance, filename, to='pybb/avatar'):
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join(to, filename)
 
+def use_category():
+    return (not hasattr(settings, 'PYBB_USE_CATEGORY')) or settings.PYBB_USE_CATEGORY
+
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -142,7 +145,10 @@ class Forum(models.Model):
         """
         Used in templates for breadcrumb building
         """
-        return self.category,
+        if use_category():
+            return self.category,
+        else:
+            return ()
 
 
 class WatchArea(models.Model):
@@ -248,7 +254,10 @@ class Topic(models.Model):
         """
         Used in templates for breadcrumb building
         """
-        return self.forum.category, self.forum
+        if use_category():
+            return self.forum.category, self.forum
+        else:
+            return self.forum,
 
     def poll_votes(self):
         if self.poll_type != self.POLL_TYPE_NONE:
@@ -335,7 +344,10 @@ class Post(RenderableItem):
         """
         Used in templates for breadcrumb building
         """
-        return self.topic.forum.category, self.topic.forum, self.topic,
+        if use_category():
+            return self.topic.forum.category, self.topic.forum, self.topic,
+        else:
+            return self.topic.forum, self.topic
 
 
 class PybbProfile(models.Model):
