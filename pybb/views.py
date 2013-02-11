@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.db.models import F, Q
+from django.db.models import F, Q, Count, Max
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
 from django.utils.translation import ugettext_lazy as _
@@ -68,6 +68,9 @@ class IndexView(generic.ListView):
         ctx['categories'] = categories
         ctx['site'] = Site.objects.get_current()
         ctx['absolute_static'] = self.request.build_absolute_uri(staticfiles_storage.base_url)
+        ctx['featured_topics'] = Topic.objects\
+            .annotate(num_posts=Count('posts')).filter(num_posts__gt=0)\
+            .annotate(last_post_created=Max('posts__created')).order_by('-last_post_created')[:5]
         return ctx
 
     def get_queryset(self):
