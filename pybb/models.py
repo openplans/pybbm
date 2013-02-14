@@ -61,6 +61,16 @@ def get_file_path(instance, filename, to='pybb/avatar'):
 def use_category():
     return (not hasattr(settings, 'PYBB_USE_CATEGORY')) or settings.PYBB_USE_CATEGORY
 
+def default_forum():
+    if hasattr(settings, 'PYBB_FORUM_ID'):
+        forum_id = settings.PYBB_FORUM_ID
+        try:
+            forum = Forum.objects.get(pk=forum_id)
+            return forum
+        except Forum.DoesNotExist:
+            raise ImproperlyConfigured('Forum %s (PYBB_FORUM_ID) does not exist.' % forum_id)
+    return None
+
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -179,6 +189,20 @@ class WatchArea(models.Model):
         if self.id is None:
             self.created = tznow()
         super(WatchArea, self).save(*args, **kwargs)
+
+    def forum(self):
+        if not hasattr(self, '_forum'):
+            self._forum = default_forum()
+        return self._forum
+
+    def get_parents(self):
+        """
+        Used in templates for breadcrumb building
+        """
+        if self.forum:
+            return self.forum,
+        else:
+            return ()
 
 
 class Topic(models.Model):
