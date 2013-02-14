@@ -19,7 +19,7 @@ $(function() {
     // This is logic for handling subscription requests asynchonously
     // TODO: this only works for the topic list. Update to work on the topic
     // page and the watch area subscriptions.
-    $('.topic-subscribe a').click(function(evt) {
+    $('.topic-subscribe,.watch-area-subscribe').find('a').click(function(evt) {
         evt.preventDefault();
         var $link = $(this),
             url = $link.attr('href');
@@ -27,7 +27,7 @@ $(function() {
         // Submit the request
         $.post(url, function(data, textStatus, jqXHR){
             // Update the href and label
-            if($link.hasClass('topic-add-subscription')) {
+            if($link.hasClass('add-subscription')) {
                 $link.text($link.attr('data-delete-subscription-label'));
                 $link.attr('href', $link.attr('data-delete-subscription-href'));
             } else {
@@ -36,7 +36,7 @@ $(function() {
             }
 
             // Swap the classes
-            $link.toggleClass('topic-add-subscription topic-delete-subscription');
+            $link.toggleClass('add-subscription delete-subscription');
         }).fail(function() { alert('I\'m sorry, we couldn\'t subscribe you. Please try again.'); });
     });
 });
