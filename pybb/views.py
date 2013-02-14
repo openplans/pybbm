@@ -186,7 +186,7 @@ class TopicView(generic.ListView):
             forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=request.user)
         except ObjectDoesNotExist:
             forum_mark = None
-        if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
+        if (forum_mark is None) or (topic.updated and forum_mark.time_stamp < topic.updated):
             # Mark topic as readed
             topic_mark, new = TopicReadTracker.objects.get_or_create(topic=topic, user=request.user)
             if not new:
