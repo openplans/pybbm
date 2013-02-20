@@ -68,7 +68,16 @@ class IndexView(generic.ListView):
         ctx['categories'] = categories
         ctx['site'] = Site.objects.get_current()
         ctx['absolute_static'] = self.request.build_absolute_uri(staticfiles_storage.base_url)
-        ctx['featured_topics'] = Topic.objects\
+        ctx['public_watch_areas'] = WatchArea.objects.filter(public=True)
+
+        featured_topics = Topic.objects
+        watch_area = None
+        if 'watch_area' in self.request.GET and self.request.GET['watch_area']:
+            watch_area = get_object_or_404(WatchArea, pk=self.request.GET['watch_area'])
+            featured_topics = featured_topics.filter(place__intersects=watch_area.fence)
+
+        ctx['selected_watch_area'] = watch_area
+        ctx['featured_topics'] = featured_topics\
             .annotate(num_posts=Count('posts')).filter(num_posts__gt=0)\
             .annotate(last_post_created=Max('posts__created')).order_by('-last_post_created')[:5]
         return ctx
