@@ -60,10 +60,10 @@
                     data-add-subscription-label="{% trans "Subscribe" %}"
                     data-delete-subscription-label="{% trans "Unsubscribe" %}"
                 {% if user in topic.subscribers.all %}
-                    class="topic delete-subscription" href="{% url pybb:delete_subscription topic.id %}">
+                    class="topic subscription-toggle delete-subscription" href="{% url pybb:delete_subscription topic.id %}">
                     {% trans "Unsubscribe" %}
                 {% else %}
-                    class="topic add-subscription" href="{% url pybb:add_subscription topic.id %}">
+                    class="topic subscription-toggle add-subscription" href="{% url pybb:add_subscription topic.id %}">
                     {% trans "Subscribe" %}
                 {% endif %}
                 </a>

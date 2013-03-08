@@ -19,7 +19,7 @@ $(function() {
     // This is logic for handling subscription requests asynchonously
     // TODO: this only works for the topic list. Update to work on the topic
     // page and the watch area subscriptions.
-    $('.topic-subscribe,.watch-area-subscribe').find('a').click(function(evt) {
+    $('a.subscription-toggle').click(function(evt) {
         evt.preventDefault();
         var $link = $(this),
             url = $link.attr('href');
