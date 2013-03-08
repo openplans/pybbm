@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import F, Q, Count, Max
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
@@ -150,11 +151,27 @@ class WatchAreaTopicsView(LatestTopicsView):
 
     template_name = 'pybb/watch_area_topics.html'
 
+    def get_watch_area(self):
+        return get_object_or_404(WatchArea, pk=self.kwargs['pk'])
+
     def get_queryset(self):
         qs = super(WatchAreaTopicsView, self).get_queryset()
-        self.watch_area = get_object_or_404(WatchArea, pk=self.kwargs['pk'])
+        self.watch_area = self.get_watch_area()
         qs = qs.filter(place__within=self.watch_area.fence)  # Should we use within or intersects?
         return qs
+
+    def user_can_access(self, user):
+        watch_area = self.get_watch_area()
+        return watch_area.public or user.is_superuser or (watch_area.user == user)
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
+        user_is_owner = user_passes_test(self.user_can_access)
+        view_func = user_is_owner(super(WatchAreaTopicsView, self).dispatch)
+        return view_func(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super(WatchAreaTopicsView, self).get_context_data(**kwargs)
@@ -294,6 +311,20 @@ class PostEditMixin(object):
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
 
+class WatchAreaAdminMixin(object):
+    def belongs_to_user(self, user):
+        return user.is_superuser or (self.get_object().user == user)
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
+        user_is_owner = user_passes_test(self.belongs_to_user)
+        view_func = user_is_owner(super(WatchAreaAdminMixin, self).dispatch)
+        return view_func(request, *args, **kwargs)
+
+
 class AddWatchAreaView(generic.CreateView):
 
     template_name = 'pybb/add_watch_area.html'
@@ -310,15 +341,11 @@ class AddWatchAreaView(generic.CreateView):
         return form_kwargs
 
 
-class EditWatchAreaView(generic.UpdateView):
+class EditWatchAreaView(WatchAreaAdminMixin, generic.UpdateView):
 
     template_name = 'pybb/add_watch_area.html'
     model = WatchArea
     form_class = WatchAreaForm
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(EditWatchAreaView, self).dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
         form_kwargs = super(EditWatchAreaView, self).get_form_kwargs()
@@ -326,19 +353,10 @@ class EditWatchAreaView(generic.UpdateView):
         return form_kwargs
 
 
-class DeleteWatchAreaView(generic.DeleteView):
+class DeleteWatchAreaView(WatchAreaAdminMixin, generic.DeleteView):
 
     template_name = 'pybb/watch_area_confirm_delete.html'
     model = WatchArea
-
-    def get_queryset(self):
-        pk = self.kwargs['pk']
-        user = self.request.user
-        return self.model.objects.filter(user=user).filter(pk=pk)
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(DeleteWatchAreaView, self).dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
         form_kwargs = super(DeleteWatchAreaView, self).get_form_kwargs()
