@@ -230,8 +230,12 @@ class TopicView(generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
+        if self.request.user.is_authenticated():
+            private_watch_area_test = Q(public=False, user=self.request.user)
+        else:
+            private_watch_area_test = Q()
         ctx['watch_areas'] = WatchArea.objects\
-            .filter(Q(public=True) | Q(public=False, user=self.request.user))\
+            .filter(Q(public=True) | private_watch_area_test)\
             .filter(fence__intersects=self.topic.place)
 
         if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
