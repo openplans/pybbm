@@ -56,7 +56,20 @@ def filter_hidden_topics(request, queryset_or_model):
     return queryset.filter(forum__hidden=False, forum__category__hidden=False)
 
 
-class IndexView(generic.ListView):
+class WatchAreaListMixin (object):
+    def get_watch_areas(self):
+        if self.request.user.is_authenticated():
+            private_watch_area_test = Q(public=False, user=self.request.user)
+        else:
+            private_watch_area_test = Q()
+
+        watch_areas = WatchArea.objects\
+            .filter(Q(public=True) | private_watch_area_test)
+
+        return watch_areas
+
+
+class IndexView(WatchAreaListMixin, generic.ListView):
 
     template_name = 'pybb/index.html'
     context_object_name = 'categories'
@@ -69,7 +82,7 @@ class IndexView(generic.ListView):
         ctx['categories'] = categories
         ctx['site'] = Site.objects.get_current()
         ctx['absolute_static'] = self.request.build_absolute_uri(staticfiles_storage.base_url)
-        ctx['public_watch_areas'] = WatchArea.objects.filter(public=True)
+        ctx['watch_areas'] = self.get_watch_areas()
 
         featured_topics = Topic.objects
         watch_area = None
@@ -179,7 +192,7 @@ class WatchAreaTopicsView(LatestTopicsView):
         return ctx
 
 
-class TopicView(generic.ListView):
+class TopicView(WatchAreaListMixin, generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
@@ -230,12 +243,7 @@ class TopicView(generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
-        if self.request.user.is_authenticated():
-            private_watch_area_test = Q(public=False, user=self.request.user)
-        else:
-            private_watch_area_test = Q()
-        ctx['watch_areas'] = WatchArea.objects\
-            .filter(Q(public=True) | private_watch_area_test)\
+        ctx['watch_areas'] = self.get_watch_areas()\
             .filter(fence__intersects=self.topic.place)
 
         if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
