@@ -230,6 +230,10 @@ class TopicView(generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
+        ctx['watch_areas'] = WatchArea.objects\
+            .filter(Q(public=True) | Q(public=False, user=self.request.user))\
+            .filter(fence__intersects=self.topic.place)
+
         if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
            pybb_topic_poll_not_voted(self.topic, self.request.user):
             ctx['poll_form'] = PollForm(self.topic)
