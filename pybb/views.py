@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
+from django.utils.timezone import datetime
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
@@ -74,8 +75,24 @@ class IndexView(WatchAreaListMixin, generic.ListView):
         ctx['categories'] = categories
         ctx['site'] = Site.objects.get_current()
         ctx['absolute_static'] = self.request.build_absolute_uri(staticfiles_storage.base_url)
-        ctx['watch_areas'] = self.get_watch_areas()
 
+        # Calculate watch area summary stats
+        watch_areas = self.get_watch_areas() \
+            .annotate(watcher_count=Count('watchers'))
+        all_topics = Topic.objects.all()
+        for watch_area in watch_areas:
+            watch_area.topics = []
+            for topic in all_topics:
+                if watch_area.fence.intersects(topic.place):
+                    watch_area.topics.append(topic)
+            watch_area.topic_count = len(watch_area.topics)
+            if watch_area.topic_count > 0:
+                watch_area.latest_update = max([
+                    topic.updated or topic.created
+                    for topic in watch_area.topics])
+        ctx['watch_areas'] = watch_areas
+
+        # Get a list of featured topics
         featured_topics = Topic.objects
 
         ctx['featured_topics'] = featured_topics\
