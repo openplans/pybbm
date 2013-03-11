@@ -194,7 +194,7 @@ class WatchArea(models.Model):
     objects = WatchAreaManager()
 
     class Meta(object):
-        ordering = ['-created']
+        ordering = ['public', 'name']
         verbose_name = _('Watch Area')
         verbose_name_plural = _('Watch Areas')
 
