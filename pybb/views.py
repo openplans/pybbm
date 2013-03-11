@@ -58,15 +58,7 @@ def filter_hidden_topics(request, queryset_or_model):
 
 class WatchAreaListMixin (object):
     def get_watch_areas(self):
-        if self.request.user.is_authenticated():
-            private_watch_area_test = Q(public=False, user=self.request.user)
-        else:
-            private_watch_area_test = Q()
-
-        watch_areas = WatchArea.objects\
-            .filter(Q(public=True) | private_watch_area_test)
-
-        return watch_areas
+        return WatchArea.objects.for_user(self.request.user)
 
 
 class IndexView(WatchAreaListMixin, generic.ListView):

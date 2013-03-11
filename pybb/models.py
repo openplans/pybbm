@@ -162,6 +162,24 @@ class Forum(models.Model):
             return ()
 
 
+class WatchAreaManager(models.GeoManager):
+    def for_user(self, user):
+        """
+        Get the watch areas that the user can access. Returns all public watch
+        areas and all areas owned by the user.
+        """
+        if user.is_authenticated():
+            private_watch_area_test = models.Q(public=False, user=user)
+        else:
+            # If there's no user logged in, then this will be a vacuous check
+            private_watch_area_test = models.Q()
+
+        watch_areas = WatchArea.objects\
+            .filter(models.Q(public=True) | private_watch_area_test)
+
+        return watch_areas
+
+
 class WatchArea(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     fence = models.GeometryField(_('Area'))
@@ -173,7 +191,7 @@ class WatchArea(models.Model):
         verbose_name=_('Watchers'), blank=True)
     public = models.BooleanField(_('Public'), default=False)
 
-    objects = models.GeoManager()
+    objects = WatchAreaManager()
 
     class Meta(object):
         ordering = ['-created']
