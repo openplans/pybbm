@@ -181,7 +181,6 @@ class WatchAreaTopicsView(LatestTopicsView):
         watch_area = self.get_watch_area()
         return watch_area.public or user.is_superuser or (watch_area.user == user)
 
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.request = request
         self.args = args
