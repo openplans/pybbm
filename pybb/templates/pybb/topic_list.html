@@ -63,7 +63,7 @@
                     class="topic subscription-toggle delete-subscription" href="{% url pybb:delete_subscription topic.id %}">
                     {% trans "Unsubscribe" %}
                 {% else %}
-                    class="topic subscription-toggle add-subscription" href="{% url pybb:add_subscription topic.id %}">
+                    class="topic add-subscription" href="{% url pybb:add_subscription topic.id %}">
                     {% trans "Subscribe" %}
                 {% endif %}
                 </a>
